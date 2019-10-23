@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 
-source ~/.config/bash/git_status.bash
+JUNK_STRING="kasljdflkasdjf"
+
+# source ~/.config/bash/git_status.bash
+GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+if [ -f "$GIT_PROMPT_PATH" ]; then
+    GIT_PROMPT_START=" "
+    GIT_PROMPT_ROOT=""
+    GIT_PROMPT_USER=""
+    GIT_PROMPT_END=" "
+    GIT_PROMPT_ONLY_IN_REPO=1
+    GIT_PROMPT_LEADING_SPACE=0
+    source "$GIT_PROMPT_PATH"
+fi
 
 COLOR_GREY=90
 COLOR_GIT_CLEAN=92
@@ -9,14 +21,9 @@ COLOR_TIME=37
 COLOR_HOST=35
 COLOR_CONDA=96
 COLOR_PATH=95
-COLOR_PROMPT_SYMBOL=$COLOR_GREY
+COLOR_PROMPT_SYMBOL=94
 COLOR_BG=49
-PROMPT_SYMBOL=":"
-
-if [ "$TERM" != "linux" ]; then
-    export _POWERLINE_ARROW=""
-    export _POWERLINE_BRANCH=" "
-fi
+PROMPT_SYMBOL=" >"
 
 _get_prompt_color() {
     local ERR="$?"
@@ -33,9 +40,9 @@ _path() {
     local path_fg=$(_get_prompt_color)
     local path_bg=$COLOR_BG
     local path_rep='\w'
-    local ps1=""
+    local str=""
     ((COLUMNS < 50)) && path_rep="$(basename "$PWD")"
-    ps1="\[\033[${path_bg};${path_fg}m\]$path_rep"
+    str="\[\033[${path_bg};${path_fg}m\]$path_rep"
     ((COLUMNS < 50)) && ps1="$ps1"$'\n'
     echo "$ps1"
 }
@@ -78,44 +85,49 @@ _conda() {
     fi
 }
 
-_set_color() {
+_color() {
     local bg = $1
-    local bg = $2
+    local fg = $2
+    echo "\[\033[${bg};${fg}m\]"
 }
 
 _git() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null; then
-        # local Git_branch="$(basename "$(git symbolic-ref HEAD 2>/dev/null)")"
-        local Git_branch="$(_git_branch_name)"
-        local Git_status=""
-        local Git_fg=0
-        local brace_fg=$COLOR_GREY
-        local bg=$COLOR_BG
-        local delim="|"
-        # Is clean working tree
-        if [ -n "$(_git_dirty)" ]; then
-            Git_fg=$COLOR_GIT_CLEAN
-            Git_status=""
-            delim=""
-        else
-            Git_fg=$COLOR_GIT_DIRTY
-            Git_status="+"
-            Git_status="$Git_status$(_git_unpushed)"
-        fi
-        # Make it all a string, relying on \w for directory
-        local str=""
-        str="$str\[\033[${bg};${brace_fg}m\]"
-        str="$str["
-        str="$str\[\033[${bg};${Git_fg}m\]"
-        str="$str$Git_status"
-        str="$str\[\033[${bg};${brace_fg}m\]"
-        str="$str$delim"
-        str="$str\[\033[${bg};${Git_fg}m\]"
-        str="$str$Git_branch"
-        str="$str\[\033[${bg};${brace_fg}m\]"
-        str="$str]"
-        echo "$str "
+        updatePrompt
+        echo "${PS1:1}"
     fi
+    # if git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null; then
+    #     # local Git_branch="$(basename "$(git symbolic-ref HEAD 2>/dev/null)")"
+    #     local Git_branch="$(_git_branch_name)"
+    #     local Git_status=""
+    #     local Git_fg=0
+    #     local brace_fg=$COLOR_GREY
+    #     local bg=$COLOR_BG
+    #     local delim="|"
+    #     # Is clean working tree
+    #     if [ -n "$(_git_dirty)" ]; then
+    #         Git_fg=$COLOR_GIT_CLEAN
+    #         Git_status=""
+    #         delim=""
+    #     else
+    #         Git_fg=$COLOR_GIT_DIRTY
+    #         Git_status="+"
+    #         Git_status="$Git_status$(_git_unpushed)"
+    #     fi
+    #     # Make it all a string, relying on \w for directory
+    #     local str=""
+    #     str="$str\[\033[${bg};${brace_fg}m\]"
+    #     str="$str["
+    #     str="$str\[\033[${bg};${Git_fg}m\]"
+    #     str="$str$Git_status"
+    #     str="$str\[\033[${bg};${brace_fg}m\]"
+    #     str="$str$delim"
+    #     str="$str\[\033[${bg};${Git_fg}m\]"
+    #     str="$str$Git_branch"
+    #     str="$str\[\033[${bg};${brace_fg}m\]"
+    #     str="$str]"
+    #     echo "$str "
+    # fi
 }
 
 _host() {
@@ -161,6 +173,8 @@ _symbol() {
 _prompt() {
     # _base_prompt
     # _reload_history
+    # local topline="$(_git)"
+    # local topline="$(_git)"
     local topline="$(_git)"
     if [ -n "$topline" ]; then
         topline="$topline\n"
