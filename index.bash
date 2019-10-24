@@ -3,3 +3,4 @@
 source ~/.config/bash/settings.bash
 source ~/.config/bash/aliases.bash
 source ~/.config/bash/prompt.bash
+source ~/.config/bash/on_login.bash

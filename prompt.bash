@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-JUNK_STRING="kasljdflkasdjf"
+PROMPT_COMMAND=""
 
 # source ~/.config/bash/git_status.bash
 GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+GIT_PROMPT_SETTINGS="$HOME/.config/bash/git_prompt_theme.bgtemplate"
 if [ -f "$GIT_PROMPT_PATH" ]; then
     GIT_PROMPT_START=" "
-    GIT_PROMPT_ROOT=""
-    GIT_PROMPT_USER=""
     GIT_PROMPT_END=" "
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_LEADING_SPACE=0
@@ -43,8 +42,8 @@ _path() {
     local str=""
     ((COLUMNS < 50)) && path_rep="$(basename "$PWD")"
     str="\[\033[${path_bg};${path_fg}m\]$path_rep"
-    ((COLUMNS < 50)) && ps1="$ps1"$'\n'
-    echo "$ps1"
+    ((COLUMNS < 50)) && str="$str"$'\n'
+    echo "$str"
 }
 
 _reload_history() {
@@ -93,41 +92,18 @@ _color() {
 
 _git() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null; then
-        updatePrompt
+        # PS1 is already filled by gitprompt.sh
         echo "${PS1:1}"
     fi
-    # if git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null; then
-    #     # local Git_branch="$(basename "$(git symbolic-ref HEAD 2>/dev/null)")"
-    #     local Git_branch="$(_git_branch_name)"
-    #     local Git_status=""
-    #     local Git_fg=0
-    #     local brace_fg=$COLOR_GREY
-    #     local bg=$COLOR_BG
-    #     local delim="|"
-    #     # Is clean working tree
-    #     if [ -n "$(_git_dirty)" ]; then
-    #         Git_fg=$COLOR_GIT_CLEAN
-    #         Git_status=""
-    #         delim=""
-    #     else
-    #         Git_fg=$COLOR_GIT_DIRTY
-    #         Git_status="+"
-    #         Git_status="$Git_status$(_git_unpushed)"
-    #     fi
-    #     # Make it all a string, relying on \w for directory
-    #     local str=""
-    #     str="$str\[\033[${bg};${brace_fg}m\]"
-    #     str="$str["
-    #     str="$str\[\033[${bg};${Git_fg}m\]"
-    #     str="$str$Git_status"
-    #     str="$str\[\033[${bg};${brace_fg}m\]"
-    #     str="$str$delim"
-    #     str="$str\[\033[${bg};${Git_fg}m\]"
-    #     str="$str$Git_branch"
-    #     str="$str\[\033[${bg};${brace_fg}m\]"
-    #     str="$str]"
-    #     echo "$str "
-    # fi
+}
+
+_last_command() {
+  if [[ "${GIT_PROMPT_LAST_COMMAND_STATE:-0}" = 0 ]]; then
+    LAST_COMMAND_INDICATOR="";
+  else
+    LAST_COMMAND_INDICATOR=" ${LAST_COMMAND_INDICATOR}"
+  fi
+  echo "${LAST_COMMAND_INDICATOR}"
 }
 
 _host() {
@@ -170,17 +146,32 @@ _symbol() {
     echo "$str "
 }
 
+_clear() {
+    PS1=""
+}
+
 _prompt() {
     # _base_prompt
     # _reload_history
     # local topline="$(_git)"
     # local topline="$(_git)"
     local topline="$(_git)"
+    # TODO this hacky shit cuts off what conda adds to
+    # bash git prompt leaving only git prompt behind
+    # topline=`echo $topline | cut -f2- -d")"`
     if [ -n "$topline" ]; then
-        topline="$topline\n"
+        topline="${topline}\n"
     fi
-    PS1="$topline$(_time) $(_host)$(_conda)$(_path)$(_symbol)$(_reset)"
+    PS1="$topline"
+    PS1="$PS1$(_time)"
+    PS1="$PS1 "
+    PS1="$PS1$(_host)"
+    PS1="$PS1$(_conda)"
+    PS1="$PS1$(_path)"
+    PS1="$PS1$(_last_command)"
+    PS1="$PS1$(_symbol)"
+    PS1="$PS1$(_reset)"
     _pre_newline
 }
 
-PROMPT_COMMAND=_prompt
+PROMPT_COMMAND="${PROMPT_COMMAND};_prompt"
