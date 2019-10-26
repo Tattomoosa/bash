@@ -3,8 +3,8 @@
 PROMPT_COMMAND=""
 
 # source ~/.config/bash/git_status.bash
-# GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
-GIT_PROMPT_PATH="$HOME/.config/bash/gitprompt.sh"
+GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+# GIT_PROMPT_PATH="$HOME/.config/bash/gitprompt.sh"
 GIT_PROMPT_SETTINGS="$HOME/.config/bash/git_prompt_theme.bgtemplate"
 if [ -f "$GIT_PROMPT_PATH" ]; then
     GIT_PROMPT_WITH_VIRTUAL_ENV=0

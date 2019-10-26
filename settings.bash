@@ -3,8 +3,12 @@ export TERM="xterm-256color"
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 bind "set completion-ignore-case on"
+
 # conda
-source /pkgs/anaconda/anaconda/etc/profile.d/conda.sh
+__CONDA_PATH=/pkgs/anaconda/anaconda/etc/profile.d/conda.sh
+if test -f "$__CONDA_PATH"; then
+  source "$__CONDA_PATH"
+fi
 # git completion
 source /usr/share/bash-completion/completions/git
 # hostname completion
