@@ -3,9 +3,11 @@
 PROMPT_COMMAND=""
 
 # source ~/.config/bash/git_status.bash
-GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+# GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+GIT_PROMPT_PATH="$HOME/.config/bash/gitprompt.sh"
 GIT_PROMPT_SETTINGS="$HOME/.config/bash/git_prompt_theme.bgtemplate"
 if [ -f "$GIT_PROMPT_PATH" ]; then
+    GIT_PROMPT_WITH_VIRTUAL_ENV=0
     GIT_PROMPT_START=" "
     GIT_PROMPT_END=" "
     GIT_PROMPT_ONLY_IN_REPO=1
@@ -93,7 +95,8 @@ _color() {
 _git() {
     if git rev-parse --is-inside-work-tree >/dev/null 2>/dev/null; then
         # PS1 is already filled by gitprompt.sh
-        echo "${PS1:1}"
+        local str="$PS1"
+        echo "${str:1}"
     fi
 }
 
@@ -156,9 +159,6 @@ _prompt() {
     # local topline="$(_git)"
     # local topline="$(_git)"
     local topline="$(_git)"
-    # TODO this hacky shit cuts off what conda adds to
-    # bash git prompt leaving only git prompt behind
-    # topline=`echo $topline | cut -f2- -d")"`
     if [ -n "$topline" ]; then
         topline="${topline}\n"
     fi
