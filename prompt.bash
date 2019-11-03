@@ -73,7 +73,7 @@ _conda() {
   if [ -n "$CONDA_DEFAULT_ENV" ]; then
     env="$CONDA_DEFAULT_ENV"
   elif [ -n "$VIRTUAL_ENV" ]; then
-    env="$VIRTUAL_ENV"
+    env="$(basename $VIRTUAL_ENV)"
   fi
   if [ -n "env" ]; then
     local brace_fg=$COLOR_GREY
