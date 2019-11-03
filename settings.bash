@@ -13,5 +13,5 @@ fi
 source /usr/share/bash-completion/completions/git
 # hostname completion
 source /usr/share/bash-completion/completions/hostname
-
-PATH="~/.bin:$PATH"
+# pull from my local .bin first
+PATH="~/.bin:~/.bin/bin:$PATH"
