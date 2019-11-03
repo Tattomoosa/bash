@@ -68,22 +68,28 @@ _zsh_newline() {
 }
 
 _conda() {
-    if [ -n "$CONDA_DEFAULT_ENV" ]; then
-        local brace_fg=$COLOR_GREY
-        local brace_fg=$COLOR_GREY
-        local conda_fg=$COLOR_CONDA
-        local bg=$COLOR_BG
-        local conda=""
-        str=""
-        str="$str\[\033[${bg};${brace_fg}m\]"
-        # str="$str("
-        str="$str\[\033[${bg};${conda_fg}m\]"
-        str="$str$CONDA_DEFAULT_ENV"
-        str="$str\[\033[${bg};${brace_fg}m\]"
-        # str="$str)"
-        str="$str:"
-        echo "$str"
-    fi
+  local env=""
+  if [ -n "$CONDA_DEFAULT_ENV" ]; then
+    env="$CONDA_DEFAULT_ENV"
+  elif [ -n "$VIRTUAL_ENV" ]; then
+    env="$VIRTUAL_ENV"
+  fi
+  if [ -n "env" ]; then
+    local brace_fg=$COLOR_GREY
+    local brace_fg=$COLOR_GREY
+    local conda_fg=$COLOR_CONDA
+    local bg=$COLOR_BG
+    local conda=""
+    str=""
+    str="$str\[\033[${bg};${brace_fg}m\]"
+    # str="$str("
+    str="$str\[\033[${bg};${conda_fg}m\]"
+    str="$str$env"
+    str="$str\[\033[${bg};${brace_fg}m\]"
+    # str="$str)"
+    str="$str:"
+    echo "$str"
+  fi
 }
 
 _color() {
