@@ -4,14 +4,9 @@ bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 bind "set completion-ignore-case on"
 
-# conda
-__CONDA_PATH=/pkgs/anaconda/anaconda/etc/profile.d/conda.sh
-if test -f "$__CONDA_PATH"; then
-  source "$__CONDA_PATH"
-fi
 # git completion
 source /usr/share/bash-completion/completions/git
 # hostname completion
 source /usr/share/bash-completion/completions/hostname
-# pull from my local .bin first
-PATH="~/.bin:~/.bin/bin:$PATH"
+
+COLUMNS=250

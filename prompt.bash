@@ -3,7 +3,7 @@
 PROMPT_COMMAND=""
 
 # source ~/.config/bash/git_status.bash
-GIT_PROMPT_PATH="$HOME/.config/bash/bash-git-prompt/gitprompt.sh"
+GIT_PROMPT_PATH="$HOME/.config/bash/dependencies/bash-git-prompt/gitprompt.sh"
 # GIT_PROMPT_PATH="$HOME/.config/bash/gitprompt.sh"
 # GIT_PROMPT_SETTINGS="$HOME/.config/bash/git_prompt_theme.bgtemplate"
 if [ -f "$GIT_PROMPT_PATH" ]; then
@@ -21,17 +21,17 @@ COLOR_GIT_CLEAN=92
 COLOR_GIT_DIRTY=91
 COLOR_TIME=37
 COLOR_HOST=35
-COLOR_CONDA=96
+COLOR_PYTHON=96
 COLOR_PATH=95
 COLOR_PROMPT_SYMBOL=94
 COLOR_BG=49
-PROMPT_SYMBOL=" >"
+PROMPT_SYMBOL="\[ \]>"
 
 _get_prompt_color() {
     local ERR="$?"
     # Default Blue
     local path_color=$COLOR_PATH
-    # Command Retuned error? Then Red
+    # Command returned error? Red
     [ "$ERR" != "0" ] && path_color=31
     # Is Root? Then White
     [ "$(id -u)" == "0" ] && path_color=35
@@ -63,31 +63,34 @@ _zsh_newline() {
     unset PROMPT_SP
     # Credit to Dennis Williamson on serverfault.com
     for ((i = 1; i<= $COLUMNS + 52; i++ )); do
-        PROMPT_SP+=' ';
+        PROMPT_SP+="\[ \]";
     done
     PS1='\[\e[7m%\e[m\]${PROMPT_SP: -$COLUMNS+1}\015'"$PS1"
 }
 
-_conda() {
+_python() {
   local env=""
-  if [ -n "$CONDA_DEFAULT_ENV" ]; then
-    env="$CONDA_DEFAULT_ENV"
-  elif [ -n "$VIRTUAL_ENV" ]; then
-    env="$(basename $VIRTUAL_ENV)"
+  if [ $VIRTUAL_ENV ]; then
+      env="$(basename $VIRTUAL_ENV)"
   fi
-  if [ -n "env" ]; then
+  if hash conda 2>/dev/null; then
+    if [ "$CONDA_DEFAULT_ENV" ]; then
+      env="$CONDA_DEFAULT_ENV"
+    elif [ "$VIRTUAL_ENV" ]; then
+      env="$(basename $VIRTUAL_ENV)"
+    fi
+  fi
+  if [ "$env" ]; then
     local brace_fg=$COLOR_GREY
     local brace_fg=$COLOR_GREY
-    local conda_fg=$COLOR_CONDA
+    local conda_fg=$COLOR_PYTHON
     local bg=$COLOR_BG
     local conda=""
     str=""
     str="$str\[\033[${bg};${brace_fg}m\]"
-    # str="$str("
     str="$str\[\033[${bg};${conda_fg}m\]"
     str="$str$env"
     str="$str\[\033[${bg};${brace_fg}m\]"
-    # str="$str)"
     str="$str:"
     echo "$str"
   fi
@@ -111,15 +114,15 @@ _last_command() {
   if [[ "${GIT_PROMPT_LAST_COMMAND_STATE:-0}" = 0 ]]; then
     LAST_COMMAND_INDICATOR="";
   else
-    LAST_COMMAND_INDICATOR=" ${LAST_COMMAND_INDICATOR}"
+    LAST_COMMAND_INDICATOR="\[ \]${LAST_COMMAND_INDICATOR}"
   fi
   echo "${LAST_COMMAND_INDICATOR}"
 }
 
 _host() {
     if [ -n "$SSH_CONNECTION" ] ||
-        [ -n "$TMUX" ] ||
-        [ -n "$SUDO_COMMAND" ]; then
+            # [ -n "$TMUX" ] ||
+            [ -n "$SUDO_COMMAND" ]; then
         local fg=$COLOR_HOST
         local brace_fg=$COLOR_GREY
         local bg=$COLOR_BG
@@ -135,12 +138,12 @@ _host() {
 }
 
 _time() {
-    local time=$(date +"%T")
+    local time=$(date +"%H:%M")
     local time_fg=$COLOR_TIME
     local brace_fg=$COLOR_GREY
     local bg=$COLOR_BG
     local str="\[\033[${bg};${brace_fg}m\]["
-    local str="$str\[\033[${bg};${time_fg}m\]${time}\]"
+    local str="$str\[\033[${bg};${time_fg}m\]\]${time}"
     local str="$str\[\033[${bg};${brace_fg}m\]]"
     echo "$str"
 }
@@ -153,7 +156,7 @@ _symbol() {
     local fg=$COLOR_PROMPT_SYMBOL
     local bg=$COLOR_BG
     local str="\[\033[${bg};${fg}m\]${PROMPT_SYMBOL}"
-    echo "$str "
+    echo "$str\[ \]"
 }
 
 _clear() {
@@ -161,24 +164,23 @@ _clear() {
 }
 
 _prompt() {
-    # _base_prompt
-    # _reload_history
-    # local topline="$(_git)"
-    # local topline="$(_git)"
     local topline="$(_git)"
     if [ -n "$topline" ]; then
         topline="${topline}\n"
     fi
     PS1="$topline"
     PS1="$PS1$(_time)"
-    PS1="$PS1 "
+    PS1="$PS1\[ \]"
     PS1="$PS1$(_host)"
-    PS1="$PS1$(_conda)"
+    PS1="$PS1$(_python)"
     PS1="$PS1$(_path)"
     PS1="$PS1$(_last_command)"
     PS1="$PS1$(_symbol)"
     PS1="$PS1$(_reset)"
+    PS1="$PS1$(_zsh_newline)"
     _pre_newline
 }
 
+# PROMPT_COMMAND=_prompt
+# PROMPT_COMMAND=_prompt
 PROMPT_COMMAND="${PROMPT_COMMAND};_prompt"
