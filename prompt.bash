@@ -25,9 +25,9 @@ COLOR_PYTHON=96
 COLOR_PATH=95
 COLOR_PROMPT_SYMBOL=94
 COLOR_BG=49
-PROMPT_SYMBOL="\[ \]>"
+PROMPT_SYMBOL=" >"
 
-_get_prompt_color() {
+_get_path_color() {
     local ERR="$?"
     # Default Blue
     local path_color=$COLOR_PATH
@@ -39,7 +39,7 @@ _get_prompt_color() {
 }
 
 _path() {
-    local path_fg=$(_get_prompt_color)
+    local path_fg=$(_get_path_color)
     local path_bg=$COLOR_BG
     local path_rep='\w'
     local str=""
@@ -63,7 +63,7 @@ _zsh_newline() {
     unset PROMPT_SP
     # Credit to Dennis Williamson on serverfault.com
     for ((i = 1; i<= $COLUMNS + 52; i++ )); do
-        PROMPT_SP+="\[ \]";
+        PROMPT_SP+=" ";
     done
     PS1='\[\e[7m%\e[m\]${PROMPT_SP: -$COLUMNS+1}\015'"$PS1"
 }
@@ -114,7 +114,7 @@ _last_command() {
   if [[ "${GIT_PROMPT_LAST_COMMAND_STATE:-0}" = 0 ]]; then
     LAST_COMMAND_INDICATOR="";
   else
-    LAST_COMMAND_INDICATOR="\[ \]${LAST_COMMAND_INDICATOR}"
+    LAST_COMMAND_INDICATOR="  ${LAST_COMMAND_INDICATOR}"
   fi
   echo "${LAST_COMMAND_INDICATOR}"
 }
@@ -156,7 +156,7 @@ _symbol() {
     local fg=$COLOR_PROMPT_SYMBOL
     local bg=$COLOR_BG
     local str="\[\033[${bg};${fg}m\]${PROMPT_SYMBOL}"
-    echo "$str\[ \]"
+    echo "$str "
 }
 
 _clear() {
@@ -181,6 +181,4 @@ _prompt() {
     _pre_newline
 }
 
-# PROMPT_COMMAND=_prompt
-# PROMPT_COMMAND=_prompt
 PROMPT_COMMAND="${PROMPT_COMMAND};_prompt"
